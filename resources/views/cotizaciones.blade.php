@@ -3,28 +3,6 @@
 @section('content')
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <main class="main-content position-relative max-height-vh-100 h-100 mt-1 border-radius-lg ">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card mb-4" style="min-height:100px !important;">
-                        <div class="card-header pb-0" style="padding: 0px !important;">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0">Cotizaciones</h6>
-                                <div>
-                                    <button type="button" class="btn bg-gradient-info" id="new_cotizacion"
-                                        style="margin: 0px; !important">
-                                        <i class="fas fa-plus"></i> Nueva Cotización
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
     <div class="modal fade" id="addCotizacionModal" tabindex="-1" aria-labelledby="addCotizacionModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" style="max-width: 95% !important">
@@ -209,11 +187,15 @@
                     <div class="card mb-4">
                         <div class="card-header pb-0">
                             <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0"></h6>
+                                <h6 class="mb-0">Cotizaciones</h6>
                                 <div>
                                     <input type="text" id="searchInput" placeholder="Buscar cotizaciones..."
                                         class="form-control"
                                         style="width: 250px; display: inline-block; margin-right: 10px; margin-bottom: 1rem;">
+                                    <button type="button" class="btn bg-gradient-info" id="new_cotizacion"
+                                        style="margin: 0px; !important">
+                                        <i class="fas fa-plus"></i> Nueva Cotización
+                                    </button>
                                 </div>
                             </div>
                         </div>

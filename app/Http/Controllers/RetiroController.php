@@ -86,7 +86,7 @@ class RetiroController extends Controller
                          $q->where('name', 'LIKE', "%{$query}%");
                      })
                      ->orderBy('id', 'desc')
-                     ->paginate(15);
+                     ->paginate(10);
     
         return response()->json($retiros);
     }

@@ -154,134 +154,139 @@
                                         style="width: 250px; display: inline-block; margin-right: 10px; margin-bottom: 1rem;">
                                     <button type="button" data-bs-toggle="modal" data-bs-target="#addRetiroModal"
                                         class="btn bg-gradient-info" style="margin: 0px; !important" "> <i class="fas fa-plus"></i>  Realizar retiro</button>
+                                                                                                                </div>
                                                                                                             </div>
                                                                                                         </div>
-                                                                                                    </div>
 
-                                                                                                    <div class="card-body px-0 pt-0 pb-2">
-                                                                                                        <div class="table-responsive p-0">
-                                                                                                            <table class="table align-items-center mb-0">
-                                                                                                                <thead>
-                                                                                                                    <tr>
-                                                                                                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                                                                                            Caja</th>
-                                                                                                                        <th
-                                                                                                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                                                                                            Monto</th>
-                                                                                                                        <th
-                                                                                                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                                                                                            Motivo</th>
-                                                                                                                        <th
-                                                                                                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                                                                                            Usuario</th>
+                                                                                                        <div class="card-body px-0 pt-0 pb-2">
+                                                                                                            <div class="table-responsive p-0">
+                                                                                                                <table class="table align-items-center mb-0">
+                                                                                                                    <thead>
+                                                                                                                        <tr>
+                                                                                                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                                                                                                Caja</th>
                                                                                                                             <th
                                                                                                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                                                                                            Fecha</th>
-                                                                                                                        <th
-                                                                                                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                                                                                            Acción</th>
-                                                                                                                        <th class="text-secondary opacity-7"></th>
-                                                                                                                    </tr>
-                                                                                                                </thead>
-                                                                                                                <tbody id="RetiroTableBody">
+                                                                                                                                Monto</th>
+                                                                                                                            <th
+                                                                                                                                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                                                                                                Motivo</th>
+                                                                                                                            <th
+                                                                                                                                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                                                                                                Usuario</th>
+                                                                                                                                <th
+                                                                                                                                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                                                                                                Fecha</th>
+                                                                                                                            <th
+                                                                                                                                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                                                                                                Acción</th>
+                                                                                                                            <th class="text-secondary opacity-7"></th>
+                                                                                                                        </tr>
+                                                                                                                    </thead>
+                                                                                                                    <tbody id="RetiroTableBody">
 
-                                                                                                                </tbody>
-                                                                                                            </table>
+                                                                                                                    </tbody>
+                                                                                                                </table>
+                                                                                                            </div>
                                                                                                         </div>
+                                                                                                        <nav aria-label="Page navigation example" class="items_paginations">
+                                                                                                            <ul class="pagination justify-content-end" id="paginationLinks">
+                                                                                                                <!-- Enlaces de paginación generados dinámicamente -->
+                                                                                                            </ul>
+                                                                                                        </nav>
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div>
-                                                                                    </div>
-                                                                                </main>
-                                                                                <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
-                                                                                <script src="{{ asset('assets/vendor/sweetalert2/sweetalert2.min.js') }}"></script>
-                                                                                <script type="text/javascript">
-                                                                                    $(document).on('click', '.fa-trash', function() {
-                                                                                        var retiroId = $(this).data('retiro-id');
-                                                                                        $('#confirmStatusChange').data('retiro-id', retiroId); // Asignar ID al botón dentro del modal.
-                                                                                    });
+                                                                                    </main>
+                                                                                    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
+                                                                                    <script src="{{ asset('assets/vendor/sweetalert2/sweetalert2.min.js') }}"></script>
+                                                                                    <script type="text/javascript">
+                                                                                        $(document).on('click', '.fa-trash', function() {
+                                                                                            var retiroId = $(this).data('retiro-id');
+                                                                                            $('#confirmStatusChange').data('retiro-id', retiroId); // Asignar ID al botón dentro del modal.
+                                                                                        });
 
 
-                                                                                    $(document).ready(function() {
-                                                                                        // Define la plantilla de la URL utilizando la función route() de Laravel
-                                                                                        var clientUrlTemplate = "{{ route('retiros.show', ['id' => ':id']) }}";
+                                                                                        $(document).ready(function() {
+                                                                                            // Define la plantilla de la URL utilizando la función route() de Laravel
+                                                                                            var clientUrlTemplate = "{{ route('retiros.show', ['id' => ':id']) }}";
 
-                                                                                        // Manejador de evento para clic en el botón de editar
-                                                                                        $('#RetiroTableBody').on('click', '.edit-btn', function() {
-                                                                                            var retiroId = $(this).data(
-                                                                                                'retiro-id'); // Obtiene el ID del cliente desde el atributo data
-                                                                                            var fetchUrl = clientUrlTemplate.replace(':id',
-                                                                                                retiroId); // Sustituye ':id' con el ID real del cliente
+                                                                                            // Manejador de evento para clic en el botón de editar
+                                                                                            $('#RetiroTableBody').on('click', '.edit-btn', function() {
+                                                                                                var retiroId = $(this).data(
+                                                                                                    'retiro-id'); // Obtiene el ID del cliente desde el atributo data
+                                                                                                var fetchUrl = clientUrlTemplate.replace(':id',
+                                                                                                    retiroId); // Sustituye ':id' con el ID real del cliente
 
-                                                                                            // Realiza una solicitud AJAX para obtener los datos del cliente
-                                                                                            $.ajax({
-                                                                                                url: fetchUrl,
-                                                                                                type: 'GET',
-                                                                                                dataType: 'json',
-                                                                                                success: function(retiro) {
-                                                                                                    // Suponiendo que tienes un formulario con campos que coinciden con las propiedades del objeto cliente
-                                                                                                    $('#retiro_id_edit').val(retiro.id);
-                                                                                                    $('#apertura_id_edit').val(retiro.id_apertura);
-                                                                                                    $('#monto_retiro_edit').val(retiro.monto);
-                                                                                                    $('#motivo_edit').val(retiro.motivo);
+                                                                                                // Realiza una solicitud AJAX para obtener los datos del cliente
+                                                                                                $.ajax({
+                                                                                                    url: fetchUrl,
+                                                                                                    type: 'GET',
+                                                                                                    dataType: 'json',
+                                                                                                    success: function(retiro) {
+                                                                                                        // Suponiendo que tienes un formulario con campos que coinciden con las propiedades del objeto cliente
+                                                                                                        $('#retiro_id_edit').val(retiro.id);
+                                                                                                        $('#apertura_id_edit').val(retiro.id_apertura);
+                                                                                                        $('#monto_retiro_edit').val(retiro.monto);
+                                                                                                        $('#motivo_edit').val(retiro.motivo);
 
-                                                                                                    $('#EditRetiroModal').modal('show');
-                                                                                                },
-                                                                                                error: function(xhr, status, error) {
-                                                                                                    console.error('Error al cargar los datos del retiro:', error);
-                                                                                                }
+                                                                                                        $('#EditRetiroModal').modal('show');
+                                                                                                    },
+                                                                                                    error: function(xhr, status, error) {
+                                                                                                        console.error('Error al cargar los datos del retiro:', error);
+                                                                                                    }
+                                                                                                });
                                                                                             });
                                                                                         });
-                                                                                    });
-                                                                                </script>
-                                                                                
-                                                                                
-                                                                                <script>
-                                                                                    $(document).ready(function() {
+                                                                                    </script>
+                                                                                    
+                                                                                    
+                                                                                    <script>
+                                                                                        $(document).ready(function() {
 
-                                                                                        $('#monto_retiro').on('input', function() {
-                                                                                            // Obtén el valor actual del input y elimina los puntos
-                                                                                            let value = $(this).val().replace(/\./g, '');
+                                                                                            $('#monto_retiro').on('input', function() {
+                                                                                                // Obtén el valor actual del input y elimina los puntos
+                                                                                                let value = $(this).val().replace(/\./g, '');
 
-                                                                                            // Asegúrate de que el valor sea un número válido antes de formatear
-                                                                                            if (!isNaN(value) && value.length > 0) {
-                                                                                                // Formatea el número con los separadores de miles
-                                                                                                let formattedValue = parseInt(value).toLocaleString('de-DE');
-                                                                                                $(this).val(formattedValue);
-                                                                                            }
-                                                                                        });
+                                                                                                // Asegúrate de que el valor sea un número válido antes de formatear
+                                                                                                if (!isNaN(value) && value.length > 0) {
+                                                                                                    // Formatea el número con los separadores de miles
+                                                                                                    let formattedValue = parseInt(value).toLocaleString('de-DE');
+                                                                                                    $(this).val(formattedValue);
+                                                                                                }
+                                                                                            });
 
-                                                                                        $('#monto_retiro_edit').on('input', function() {
-                                                                                            // Obtén el valor actual del input y elimina los puntos
-                                                                                            let value = $(this).val().replace(/\./g, '');
+                                                                                            $('#monto_retiro_edit').on('input', function() {
+                                                                                                // Obtén el valor actual del input y elimina los puntos
+                                                                                                let value = $(this).val().replace(/\./g, '');
 
-                                                                                            // Asegúrate de que el valor sea un número válido antes de formatear
-                                                                                            if (!isNaN(value) && value.length > 0) {
-                                                                                                // Formatea el número con los separadores de miles
-                                                                                                let formattedValue = parseInt(value).toLocaleString('de-DE');
-                                                                                                $(this).val(formattedValue);
-                                                                                            }
-                                                                                        });
-                                                                                        // Inicializar la búsqueda y paginación
-                                                                                        loadTableData('{{ route('retiros.searchRetiroList') }}');
+                                                                                                // Asegúrate de que el valor sea un número válido antes de formatear
+                                                                                                if (!isNaN(value) && value.length > 0) {
+                                                                                                    // Formatea el número con los separadores de miles
+                                                                                                    let formattedValue = parseInt(value).toLocaleString('de-DE');
+                                                                                                    $(this).val(formattedValue);
+                                                                                                }
+                                                                                            });
+                                                                                            // Inicializar la búsqueda y paginación
+                                                                                            loadTableData('{{ route('retiros.searchRetiroList') }}');
 
-                                                                                        // Evento de input para el buscador
-                                                                                        $('#searchInput').on('input', function() {
-                                                                                            const query = $(this).val();
-                                                                                            loadTableData(`{{ route('retiros.searchRetiroList') }}?query=${query}`);
-                                                                                        });
+                                                                                            // Evento de input para el buscador
+                                                                                            $('#searchInput').on('input', function() {
+                                                                                                const query = $(this).val();
+                                                                                                loadTableData(`{{ route('retiros.searchRetiroList') }}?query=${query}`);
+                                                                                            });
 
-                                                                                        function loadTableData(url) {
-                                                                                            $.ajax({
-                                                                                                url: url,
-                                                                                                type: 'GET',
-                                                                                                dataType: 'json',
-                                                                                                success: function(response) {
-                                                                                                    let tableBody = $('#RetiroTableBody');
-                                                                                                    tableBody.empty();
-                                                                                                    response.data.forEach(retiros => {
-                                                                                                        let row = `
+                                                                                            function loadTableData(url) {
+                                                                                                $.ajax({
+                                                                                                    url: url,
+                                                                                                    type: 'GET',
+                                                                                                    dataType: 'json',
+                                                                                                    success: function(response) {
+                                                                                                        let tableBody = $('#RetiroTableBody');
+                                                                                                        tableBody.empty();
+                                                                                                        response.data.forEach(retiros => {
+                                                                                                            let row = `
                         <tr>
                             <td  >
                                 <div class="d-flex px-2 py-1">
@@ -308,138 +313,169 @@
                                 </a>
                             </td>
                         </tr>`;
-                                                                                                        tableBody.append(row);
-                                                                                                    });
-                                                                                                },
-                                                                                                error: function(xhr, status, error) {
-                                                                                                    console.error('Error al obtener los datos:', error);
-                                                                                                }
-                                                                                            });
-                                                                                        }
+                                                                                                            tableBody.append(row);
+                                                                                                        });
+                                                                                                        $('#paginationLinks').empty();
+                                                                                                        if (response.links) {
+                                                                                                            response.links.forEach((link, index) => {
+                                                                                                                let label = link.label;
 
-                                                                                        $('#EditRetiroForm').submit(function(e) {
-                                                                                            e.preventDefault(); // Prevent the form from submitting via the browser.
+                                                                                                                // Reemplazar las palabras "Previous" y "Next" por los símbolos de flecha
+                                                                                                                if (label.includes("Previous")) {
+                                                                                                                    label = "&laquo;"; // Flecha hacia la izquierda
+                                                                                                                }
+                                                                                                                if (label.includes("Next")) {
+                                                                                                                    label = "&raquo;"; // Flecha hacia la derecha
+                                                                                                                }
 
+                                                                                                                let activeClass = link.active ? 'active' : '';
+                                                                                                                let disabledClass = link.url ? '' : 'disabled';
+                                                                                                                let paginationLink = `
+                    <li class="page-item ${activeClass} ${disabledClass}">
+                        <a class="page-link" href="#" data-url="${link.url}" ${!link.url ? 'tabindex="-1"' : ''}>${label}</a>
+                    </li>`;
+                                                                                                                $('#paginationLinks').append(paginationLink);
+                                                                                                            });
 
-                                                                                            $('#monto_retiro_edit').val($('#monto_retiro_edit').val().replace(/\./g, ''));
-
-
-                                                                                            var formData = new FormData(this); // Create a FormData object to pass with AJAX.
-
-                                                                                            $.ajax({
-                                                                                                url: '{{ route('retiros.update') }}', // Adjust this to your route defined in Laravel routes.
-                                                                                                type: 'POST',
-                                                                                                data: formData,
-                                                                                                contentType: false, // Required for 'multipart/form-data' type forms.
-                                                                                                processData: false, // Required for 'multipart/form-data' type forms.
-                                                                                                success: function(response) {
-
-                                                                                                    Swal.fire({
-                                                                                                        icon: 'success',
-                                                                                                        title: '¡Éxito!',
-                                                                                                        text: 'Retiro de caja actualizado con exito.',
-                                                                                                        showConfirmButton: true,
-                                                                                                        confirmButtonText: 'OK',
-                                                                                                        timer: 1500,
-                                                                                                        timerProgressBar: true,
-                                                                                                        allowOutsideClick: true,
-                                                                                                        willClose: () => {
-                                                                                                            $('#EditRetiroForm')[0].reset();
-                                                                                                            $('#EditRetiroModal').modal('hide');
-                                                                                                            loadTableData(
-                                                                                                                '{{ route('retiros.searchRetiroList') }}'
-                                                                                                            );
+                                                                                                            // Habilitar la navegación por paginación al hacer clic en los enlaces
+                                                                                                            $('#paginationLinks .page-link').on('click', function(e) {
+                                                                                                                e.preventDefault();
+                                                                                                                const url = $(this).data('url');
+                                                                                                                if (url) {
+                                                                                                                    loadTableData(url); // Cargar la nueva página de resultados
+                                                                                                                }
+                                                                                                            });
                                                                                                         }
-                                                                                                    });
-                                                                                                },
-                                                                                                error: function(xhr) {
-                                                                                                    var errors = xhr.responseJSON.errors;
-                                                                                                    var errorHtml = '';
-                                                                                                    $.each(errors, function(key, value) {
-                                                                                                        errorHtml += '<p>' + value + '</p>';
-                                                                                                    });
+                                                                                                    },
+                                                                                                    error: function(xhr, status, error) {
+                                                                                                        console.error('Error al obtener los datos:', error);
+                                                                                                    }
+                                                                                                });
+                                                                                            }
 
-                                                                                                    Swal.fire({
-                                                                                                        icon: 'error',
-                                                                                                        title: 'Error',
-                                                                                                        html: errorHtml,
-                                                                                                        confirmButtonText: 'Cerrar'
-                                                                                                    });
-                                                                                                }
+                                                                                            $('#EditRetiroForm').submit(function(e) {
+                                                                                                e.preventDefault(); // Prevent the form from submitting via the browser.
+
+
+                                                                                                $('#monto_retiro_edit').val($('#monto_retiro_edit').val().replace(/\./g, ''));
+
+
+                                                                                                var formData = new FormData(this); // Create a FormData object to pass with AJAX.
+
+                                                                                                $.ajax({
+                                                                                                    url: '{{ route('retiros.update') }}', // Adjust this to your route defined in Laravel routes.
+                                                                                                    type: 'POST',
+                                                                                                    data: formData,
+                                                                                                    contentType: false, // Required for 'multipart/form-data' type forms.
+                                                                                                    processData: false, // Required for 'multipart/form-data' type forms.
+                                                                                                    success: function(response) {
+
+                                                                                                        Swal.fire({
+                                                                                                            icon: 'success',
+                                                                                                            title: '¡Éxito!',
+                                                                                                            text: 'Retiro de caja actualizado con exito.',
+                                                                                                            showConfirmButton: true,
+                                                                                                            confirmButtonText: 'OK',
+                                                                                                            timer: 1500,
+                                                                                                            timerProgressBar: true,
+                                                                                                            allowOutsideClick: true,
+                                                                                                            willClose: () => {
+                                                                                                                $('#EditRetiroForm')[0].reset();
+                                                                                                                $('#EditRetiroModal').modal('hide');
+                                                                                                                loadTableData(
+                                                                                                                    '{{ route('retiros.searchRetiroList') }}'
+                                                                                                                );
+                                                                                                            }
+                                                                                                        });
+                                                                                                    },
+                                                                                                    error: function(xhr) {
+                                                                                                        var errors = xhr.responseJSON.errors;
+                                                                                                        var errorHtml = '';
+                                                                                                        $.each(errors, function(key, value) {
+                                                                                                            errorHtml += '<p>' + value + '</p>';
+                                                                                                        });
+
+                                                                                                        Swal.fire({
+                                                                                                            icon: 'error',
+                                                                                                            title: 'Error',
+                                                                                                            html: errorHtml,
+                                                                                                            confirmButtonText: 'Cerrar'
+                                                                                                        });
+                                                                                                    }
+                                                                                                });
+                                                                                            });
+
+                                                                                            $('#addRetiroForm').on('submit', function(e) {
+                                                                                                e.preventDefault(); // Prevenir el envío normal del formulario
+
+                                                                                                $('#monto_retiro').val($('#monto_retiro').val().replace(/\./g, ''));
+
+                                                                                                var formData = new FormData(this);
+
+                                                                                                $.ajax({
+                                                                                                    url: '{{ route('retiros.store') }}', // Cambia esta URL si es necesario
+                                                                                                    type: 'POST',
+                                                                                                    data: formData,
+                                                                                                    processData: false, // No procesar los datos (necesario para FormData)
+                                                                                                    contentType: false, // No establecer ningún tipo de contenido (necesario para FormData)
+                                                                                                    success: function(response) {
+
+                                                                                                        Swal.fire({
+                                                                                                            icon: 'success',
+                                                                                                            title: '¡Éxito!',
+                                                                                                            text: 'Retiro de caja exitoso.',
+                                                                                                            showConfirmButton: true,
+                                                                                                            confirmButtonText: 'OK',
+                                                                                                            timer: 1500,
+                                                                                                            timerProgressBar: true,
+                                                                                                            allowOutsideClick: true,
+                                                                                                            willClose: () => {
+                                                                                                                $('#addRetiroForm')[0].reset();
+                                                                                                                $('#addRetiroModal').modal('hide');
+                                                                                                                loadTableData(
+                                                                                                                    '{{ route('retiros.searchRetiroList') }}'
+                                                                                                                );
+                                                                                                            }
+                                                                                                        });
+                                                                                                    },
+                                                                                                    error: function(xhr) {
+                                                                                                        var errors = xhr.responseJSON.errors;
+                                                                                                        var errorHtml = '';
+                                                                                                        $.each(errors, function(key, value) {
+                                                                                                            errorHtml += '<p>' + value + '</p>';
+                                                                                                        });
+
+                                                                                                        Swal.fire({
+                                                                                                            icon: 'error',
+                                                                                                            title: 'Error',
+                                                                                                            html: errorHtml,
+                                                                                                            confirmButtonText: 'Cerrar'
+                                                                                                        });
+                                                                                                    }
+                                                                                                });
+                                                                                            });
+
+                                                                                            $('#confirmStatusChange').click(function() {
+                                                                                                var clientId = $(this).data('retiro-id');
+                                                                                                $.ajax({
+                                                                                                    url: '{{ route('clients.changeStatus') }}', // Ajusta esto a tu ruta definida en las rutas de Laravel.
+                                                                                                    type: 'POST',
+                                                                                                    data: {
+                                                                                                        id: clientId,
+                                                                                                        status: 0,
+                                                                                                        _token: '{{ csrf_token() }}'
+                                                                                                    },
+                                                                                                    success: function(response) {
+                                                                                                        $('#confirmStatusChangeModal').modal('hide');
+                                                                                                        loadTableData(
+                                                                                                            '{{ route('retiros.searchRetiroList') }}'
+                                                                                                        ); // Recargar la tabla para reflejar los cambios.
+                                                                                                    },
+                                                                                                    error: function() {
+                                                                                                        alert('Hubo un error al cambiar el estado del cliente.');
+                                                                                                    }
+                                                                                                });
                                                                                             });
                                                                                         });
-
-                                                                                        $('#addRetiroForm').on('submit', function(e) {
-                                                                                            e.preventDefault(); // Prevenir el envío normal del formulario
-
-                                                                                            $('#monto_retiro').val($('#monto_retiro').val().replace(/\./g, ''));
-
-                                                                                            var formData = new FormData(this);
-
-                                                                                            $.ajax({
-                                                                                                url: '{{ route('retiros.store') }}', // Cambia esta URL si es necesario
-                                                                                                type: 'POST',
-                                                                                                data: formData,
-                                                                                                processData: false, // No procesar los datos (necesario para FormData)
-                                                                                                contentType: false, // No establecer ningún tipo de contenido (necesario para FormData)
-                                                                                                success: function(response) {
-
-                                                                                                    Swal.fire({
-                                                                                                        icon: 'success',
-                                                                                                        title: '¡Éxito!',
-                                                                                                        text: 'Retiro de caja exitoso.',
-                                                                                                        showConfirmButton: true,
-                                                                                                        confirmButtonText: 'OK',
-                                                                                                        timer: 1500,
-                                                                                                        timerProgressBar: true,
-                                                                                                        allowOutsideClick: true,
-                                                                                                        willClose: () => {
-                                                                                                            $('#addRetiroForm')[0].reset();
-                                                                                                            $('#addRetiroModal').modal('hide');
-                                                                                                            loadTableData(
-                                                                                                                '{{ route('retiros.searchRetiroList') }}'
-                                                                                                            );
-                                                                                                        }
-                                                                                                    });
-                                                                                                },
-                                                                                                error: function(xhr) {
-                                                                                                    var errors = xhr.responseJSON.errors;
-                                                                                                    var errorHtml = '';
-                                                                                                    $.each(errors, function(key, value) {
-                                                                                                        errorHtml += '<p>' + value + '</p>';
-                                                                                                    });
-
-                                                                                                    Swal.fire({
-                                                                                                        icon: 'error',
-                                                                                                        title: 'Error',
-                                                                                                        html: errorHtml,
-                                                                                                        confirmButtonText: 'Cerrar'
-                                                                                                    });
-                                                                                                }
-                                                                                            });
-                                                                                        });
-
-                                                                                        $('#confirmStatusChange').click(function() {
-                                                                                            var clientId = $(this).data('retiro-id');
-                                                                                            $.ajax({
-                                                                                                url: '{{ route('clients.changeStatus') }}', // Ajusta esto a tu ruta definida en las rutas de Laravel.
-                                                                                                type: 'POST',
-                                                                                                data: {
-                                                                                                    id: clientId,
-                                                                                                    status: 0,
-                                                                                                    _token: '{{ csrf_token() }}'
-                                                                                                },
-                                                                                                success: function(response) {
-                                                                                                    $('#confirmStatusChangeModal').modal('hide');
-                                                                                                    loadTableData(
-                                                                                                        '{{ route('retiros.searchRetiroList') }}'
-                                                                                                    ); // Recargar la tabla para reflejar los cambios.
-                                                                                                },
-                                                                                                error: function() {
-                                                                                                    alert('Hubo un error al cambiar el estado del cliente.');
-                                                                                                }
-                                                                                            });
-                                                                                        });
-                                                                                    });
-                                                                                </script>
+                                                                                    </script>
 @endsection
