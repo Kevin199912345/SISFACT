@@ -16,7 +16,7 @@
     @else
         @if (\Request::is('rtl'))  
             @include('layouts.navbars.auth.sidebar-rtl')
-            <main class="main-content position-relative max-height-vh-100 h-100 mt-1 border-radius-lg overflow-hidden">
+            <main class="main-content position-relative max-height-vh-100 h-100 mt-1 border-radius-lg overflow-hidden size_fix">
                 @include('layouts.navbars.auth.nav-rtl')
                 <div class="container-fluid py-4">
                     @yield('content')
@@ -26,7 +26,7 @@
 
         @elseif (\Request::is('profile'))  
             @include('layouts.navbars.auth.sidebar')
-            <div class="main-content position-relative bg-gray-100 max-height-vh-100 h-100">
+            <div class="main-content position-relative bg-gray-100 max-height-vh-100 h-100 size_fix">
                 @include('layouts.navbars.auth.nav')
                 @yield('content')
             </div>
@@ -35,7 +35,7 @@
             @include('layouts.navbars.auth.nav')
             <div class="border-radius-xl mt-3 mx-3 position-relative" style="background-image: url('{{ asset('assets/img/vr-bg.jpg') }}') ; background-size: cover;">
                 @include('layouts.navbars.auth.sidebar')
-                <main class="main-content mt-1 border-radius-lg">
+                <main class="main-content mt-1 border-radius-lg size_fix">
                     @yield('content')
                 </main>
             </div>
@@ -43,7 +43,7 @@
 
         @else
             @include('layouts.navbars.auth.sidebar')
-            <main class="main-content position-relative max-height-vh-100 h-100 mt-1 border-radius-lg {{ (Request::is('rtl') ? 'overflow-hidden' : '') }}">
+            <main class="main-content position-relative max-height-vh-100 h-100 mt-1 border-radius-lg size_fix{{ (Request::is('rtl') ? 'overflow-hidden' : '') }}">
                 @include('layouts.navbars.auth.nav')
                 <div class="container-fluid py-4">
                     @yield('content')

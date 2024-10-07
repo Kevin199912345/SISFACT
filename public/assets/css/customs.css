@@ -238,3 +238,27 @@
     align-items: center;
     justify-content: center;
 }
+
+.justify-content-center_custom {
+    justify-content: center;
+}
+
+.minimize-menu-side {
+    max-width: 10% !important;
+}
+
+.direction_row_css {
+    flex-direction: column !important;
+}
+
+.hidden_div {
+    display: none !important;
+}
+
+.fix_size_ajust {
+    margin-left: 10% !important;
+}
+
+.max_with_container {
+    max-width: 100% !important;
+}

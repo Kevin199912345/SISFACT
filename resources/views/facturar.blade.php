@@ -1,532 +1,952 @@
-<!DOCTYPE html>
-<html lang="es">
+@extends('layouts.user_type.auth')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facturación - SISFACT CR</title>
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-    <link id="pagestyle" href="{{ asset('assets/css/soft-ui-dashboard.css?v=1.0.3') }}" rel="stylesheet" />
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
+@section('content')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            max-width: 100%;
-            !important;
-        }
+    <div class="container max_with_container" id="id_container_invoice">
+        <form id="addCotizacionForm" enctype="multipart/form-data">
+            @csrf
 
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 20px;
-        }
+            <input type="hidden" id="cotizacion_id" name="cotizacion_id">
 
-
-
-        .scanner-input {
-            width: 90%;
-            margin-bottom: 20px;
-            display: flex;
-        }
-
-        #barcode {
-            width: 25%;
-            height: 40px;
-        }
-
-        input[type="text"],
-        input[type="number"] {
-            width: 100%;
-            padding: 15px;
-            font-size: 18px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            outline: none;
-            transition: border 0.3s ease;
-        }
-
-        input[type="text"]:focus,
-        input[type="number"]:focus {
-            border-color: #5cb85c;
-        }
-
-        .table-container {
-            width: 100%;
-            max-width: 90%;
-            margin-top: 30px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table th,
-        table td {
-            padding: 15px;
-            text-align: center;
-        }
-
-        table th {
-            background-color: #5cb85c;
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        table td {
-            border-bottom: 1px solid #eee;
-        }
-
-        .sub-total-price {
-            text-align: right;
-            margin-top: 20px;
-            font-size: 22px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .total-price {
-            text-align: right;
-            margin-top: 20px;
-            font-size: 22px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .total-price-iva {
-            text-align: right;
-            margin-top: 20px;
-            font-size: 22px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            justify-content: center;
-        }
-
-        .quantity-controls button,
-        .quantity-controls input {
-            border: 1px solid #ccc;
-            background-color: #fff;
-            padding: 5px 10px;
-            text-align: center;
-            width: 35px;
-            height: 35px;
-            line-height: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .quantity-controls button:hover {
-            background-color: #e6e6e6;
-        }
-
-        .quantity-controls input {
-            width: 50px;
-            /* Ajusta el ancho del input si es necesario */
-            padding: 5px;
-            text-align: center;
-            font-size: 16px;
-            /* Ajusta el tamaño de la fuente si es necesario */
-        }
-
-        .remove-btn {
-            padding: 0 5px;
-            color: white !important;
-            background-color: #5cb85c;
-            /* Un rojo más claro, estilo tomate */
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            /* Hacer la 'X' más grande */
-            line-height: 20px;
-            /* Ajustar la altura de línea si es necesario */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 35px;
-            /* Ajustar según el diseño */
-            width: 35px;
-            /* Hacer el botón cuadrado */
-        }
-
-        .remove-btn:hover {
-            background-color: #d9534f;
-            /* Un rojo más oscuro para hover */
-        }
-
-        /* Hacer que la tabla tenga un scroll interno */
-        .table-container {
-            max-height: 50vh;
-            /* Altura máxima antes de que aparezca el scroll */
-            overflow-y: auto;
-            /* Scroll vertical dentro de la tabla */
-            margin-bottom: 20px;
-            /* Espacio entre la tabla y los totales */
-            border: 1px solid #ddd;
-            /* Añade un borde para destacar el área de la tabla */
-        }
-
-        /* Mantener el ancho completo de la tabla dentro del contenedor */
-        .table-container table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        /* Asegurarse de que las celdas de la tabla tengan buen padding y un borde inferior */
-        .table-container th,
-        .table-container td {
-            padding: 8px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-
-        /* Fijar los totales en la parte inferior derecha */
-        .totales_facturacion_class {
-            position: fixed;
-            bottom: 20px;
-            background-color: #fff;
-            padding: 1%;
-            border: 1px solid #ddd;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            /* Asegura que siempre esté visible */
-            display: flex;
-            flex-direction: column;
-            align-items: end;
-            width: 87%;
-            border-radius: 20px;
-        }
-
-        .table-container th {
-            position: sticky;
-            top: 0;
-            /* Fondo del encabezado para distinguirlo */
-            z-index: 2;
-            /* Asegura que esté por encima de las celdas de datos */
-            box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
-            /* Sombra para mejor visualización */
-        }
-
-        /* Asegurar que las celdas no se desborden */
-        .table-container th,
-        .table-container td {
-            white-space: nowrap;
-            /* Evita que el contenido se desborde */
-        }
-
-        .btn {
-            background-image: linear-gradient(310deg, #627594, #a8b8d8);
-            background-color: transparent;
-            border: 1px solid transparent;
-            border-radius: .5rem;
-            color: #fff;
-            cursor: pointer;
-            display: inline-block;
-            font-size: .75rem;
-            font-weight: 700;
-            line-height: 1.4;
-            padding: .75rem 1.5rem;
-            text-align: center;
-            transition: all .15s ease-in;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            vertical-align: middle;
-            background-position-x: 25%;
-            background-size: 150%;
-            box-shadow: 0 4px 7px -1px rgba(0, 0, 0, .11), 0 2px 4px -1px rgba(0, 0, 0, .07);
-            letter-spacing: -.025rem;
-            margin-left: 10px;
-            height: 40px;
-        }
-
-        #select_tipo_doc {
-            width: 15%;
-            margin-left: 10px;
-            height: 40px;
-        }
-
-        #additionalInput{
-            margin-left: 10px;
-            width: 25%; 
-            height: 40px;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container">
-        <div class="scanner-input">
-            <input type="text" id="barcode" placeholder="Escanea el código de barras..." autofocus>
-            <button type="button" data-bs-toggle="modal" data-bs-target="#addProductModal"
-                class="btn bg-gradient-secondary"><i class="fas fa-search"></i> Buscar Producto</button>
-            <select class="form-select" name="select_tipo_doc" id="select_tipo_doc"
-                title="Definir el tipo de documento" onchange="toggleInputVisibility()">
-                <option value=""> --- Seleccione --- </option>
-                <option value="01"> Factura electrónica </option>
-                <option value="03"> Nota de crédito electrónica </option>
-                <option value="04" selected> Tiquete Electrónico </option>
-                <option value="08"> Factura electrónica de Compra </option>
-            </select>
-
-            <input type="text" class="form-control" id="additionalInput" placeholder="Buscar cliente por nombre o cédula" style="display:none;">
-            <button type="button" data-bs-toggle="modal" data-bs-target="#addProductModal"
-                class="btn bg-gradient-secondary" id="btn_buscar_client" style="display:none;" ><i class="fas fa-search"></i> Buscar Cliente</button>
-                <button type="button" data-bs-toggle="modal" data-bs-target="#addProductModal"
-                class="btn bg-gradient-secondary" style="display:none;" id="btn_add_client"><i class="fas fa-user-plus"></i> Agregar Cliente</button>
-        </div>
-
-        <div class="table-container">
-            <table id="product-table">
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Precio</th>
-                        <th>Descuento (%)</th>
-                        <th>Cantidad</th>
-                        <th>Total</th>
-                        <th>IVA</th>
-                        <th>Acción</th>
-                    </tr>
-                </thead>
-                <tbody id="product-list">
-                    <!-- Productos escaneados aparecerán aquí -->
-                </tbody>
-            </table>
-        </div>
-        <div class="totales_facturacion_class">
-            <div class="total-price-iva" id="total-price-iva">
-                Total IVA: ₡0.00
+            <!-- Primera fila: Número de Cotización, Cliente, Fecha Creación y Fecha Vencimiento -->
+            <div class="row mb-3 hidden_div" id="fact_div_electr">
+                <div class="col-md-3">
+                    <label for="num_cotizacion" class="form-label">Número de Cotización</label><span class="span-red">
+                        *</span>
+                    <input type="text" class="form-control" id="num_cotizacion" name="num_cotizacion" required readonly>
+                </div>
+                <div class="col-md-3">
+                    <label for="searchClient" class="form-label">Cliente</label><span class="span-red"> *</span>
+                    <input type="text" class="form-control" autocomplete="off" name="searchClient" id="searchClient"
+                        placeholder="Escriba para buscar el cliente" required>
+                    <div id="clientResults"
+                        style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 5px; display: none;">
+                        <!-- Encabezado de dos columnas -->
+                        <div id="clientResultsHeader"
+                            style="display: none; font-weight: bold; padding: 5px; border-bottom: 1px solid #000; background-color: #f0f0f0;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="width: 40%;">Cédula</span>
+                                <span style="width: 60%;">Nombre</span>
+                            </div>
+                        </div>
+                        <!-- Los resultados se mostrarán aquí -->
+                        <div id="clientResultsList"></div>
+                    </div>
+                    <!-- Campo oculto para almacenar el ID del cliente seleccionado -->
+                    <input type="hidden" id="selectedClientId" name="client_id">
+                </div>
+                <div class="col-md-3">
+                    <label for="fecha_creacion" class="form-label">Fecha Creación</label><span class="span-red"> *</span>
+                    <input type="date" class="form-control" id="fecha_creacion" name="fecha_creacion" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="fecha_vencimiento" class="form-label">Fecha Vencimiento</label><span class="span-red">
+                        *</span>
+                    <input type="date" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento" required>
+                </div>
             </div>
-            <div class="sub-total-price" id="sub-total-price">
-                Sub Total: ₡0.00
+
+            <!-- Segunda fila: Búsqueda de Productos, Crédito y Plazo -->
+            <div class="row mb-3">
+                <div class="col-md-8">
+                    <label for="searchProducto" class="form-label">Búsqueda de Productos</label><span class="span-red">
+                        *</span>
+                    <input type="text" class="form-control" autocomplete="off" name="searchProducto" id="searchProducto"
+                        placeholder="Escriba para buscar el producto">
+                    <div id="productsResults"
+                        style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 5px; display: none;">
+                        <!-- Encabezado de dos columnas -->
+                        <div id="productsResultsHeader"
+                            style="display: none; font-weight: bold; padding: 5px; border-bottom: 1px solid #000; background-color: #f0f0f0;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="width: 30%;">Imagen</span>
+                                <span style="width: 30%;">Código</span>
+                                <span style="width: 30%;">Nombre</span>
+                                <span style="width: 10%;">Precio</span>
+                            </div>
+                        </div>
+                        <!-- Los resultados se mostrarán aquí -->
+                        <div id="ProductoResultsList"></div>
+                    </div>
+                    <!-- Campo oculto para almacenar el ID del producto seleccionado -->
+                    <input type="hidden" id="selectedProductId" name="product_id">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="fecr" id="inlineCheckbox2" value="1">
+                        <label class="form-check-label" for="inlineCheckbox2">Factura Electrónica</label>
+                    </div>
+                    <div id="plazoContainer" class="d-flex align-items-center ms-3 hidden-important">
+                        <label for="plazo" class="form-label me-2">Plazo (días)</label>
+                        <input type="number" class="form-control" id="plazo" name="plazo" min="1"
+                            style="width: 80px; text-align: center;">
+                    </div>
+                </div>
             </div>
-            <div class="total-price" id="total-price">
-                Total: ₡0.00
+
+            <!-- Tabla para mostrar los productos seleccionados -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-container">
+                        <table class="table table-bordered" id="selectedProductsTable" style="display: none;">
+                            <thead class="table-header">
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Descripción</th>
+                                    <th>Precio</th>
+                                    <th>% Impuesto</th>
+                                    <th>Cantidad</th>
+                                    <th>% Descuento</th>
+                                    <th>Total</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Los productos seleccionados se agregarán aquí -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-        </div>
+
+            <!-- Observaciones y Totales -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <span>Subtotal:</span>
+                                <span id="subtotalDisplay">₡0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Impuestos:</span>
+                                <span id="taxDisplay">₡0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Descuentos:</span>
+                                <span id="discountDisplay">₡0.00</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <span>Total:</span>
+                                <span id="totalDisplay">₡0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="btn_coti mt-3">
+                <button type="submit" id="btn_text_form" class="btn bg-gradient-success">Facturar</button>
+            </div>
+        </form>
+
+        <div id="responseMessageAddRetiro" class="mt-3"></div>
     </div>
-    <script>
-        function toggleInputVisibility() {
-            var select = document.getElementById('select_tipo_doc');
-            var input = document.getElementById('additionalInput');
-            var addclient = document.getElementById('btn_add_client');
-            var searchclient = document.getElementById('btn_buscar_client');
-            if (select.value === '01' || select.value === '03' || select.value === '08') {
-                input.style.display = 'block'; // Muestra el input
-                addclient.style.display = 'block';
-                searchclient.style.display = 'block';
-            } else {
-                input.style.display = 'none'; // Oculta el input
-                addclient.style.display = 'none';
-                searchclient.style.display = 'none';
-            }
-        }
-        
-        // Ejecuta la función al cargar para establecer el estado inicial del input
-        window.onload = toggleInputVisibility;
-        </script>
-    <script>
-        let totalPrice = 0;
-        let totalIVA = 0;
-        let products = {};
-        let debounceTimeout;
 
-        window.onload = focusBarcodeInput;
 
-        document.getElementById('barcode').addEventListener('input', function() {
-            const barcode = this.value.trim();
-            clearTimeout(debounceTimeout);
-            debounceTimeout = setTimeout(() => {
-                if (barcode.length > 5) {
-                    // Simulación de búsqueda de producto (cambiar por tu ruta a la API de búsqueda)
-                    fetch(`{{ route('product.search') }}?barcode=${barcode}`)
-                        .then(response => response.ok ? response.json() : Promise.reject(
-                            'Producto no encontrado'))
-                        .then(data => {
-                            document.getElementById('barcode').value = '';
-                            if (products[data.barcode]) {
-                                adjustQuantity(data.barcode, 1);
-                            } else {
-                                products[data.barcode] = {
-                                    name: data.name,
-                                    price: parseFloat(data.price), // Precio costo (sin IVA)
-                                    price_sell: parseFloat(data
-                                        .price_sell), // Precio venta (con IVA)
-                                    quantity: 1,
-                                    discount: 0, // Descuento inicial 0%
-                                    total: parseFloat(data.price_sell),
-                                    tax_percentage: parseFloat(data.tax_percentage) // % de IVA
-                                };
-                                addProductRow(data.barcode);
-                            }
-                            updateTotalPrice();
-                        })
-                        .catch(error => {
-                            console.error(error);
-                            alert(error);
-                            focusBarcodeInput();
-                        });
+    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/sweetalert2/sweetalert2.min.js') }}"></script>
+    
+    <script>
+        let isEditMode = false; // Variable global para identificar el modo
+
+        $(document).ready(function() {
+
+            $('#inlineCheckbox2').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('#obs_fact_div_electr').removeClass('hidden_div');
+                    $('#fact_div_electr').removeClass('hidden_div'); // Mostrar
+                } else {
+                    $('#fact_div_electr').addClass('hidden_div'); // Ocultar
+                    $('#obs_fact_div_electr').addClass('hidden_div');
                 }
-            }, 500);
-        });
-
-        function addProductRow(barcode) {
-            const product = products[barcode];
-            const row = document.createElement('tr');
-            row.innerHTML = `
-        <td>${product.name}</td>
-        <td>₡${product.price_sell.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td> <!-- Mostramos el price_sell (ya incluye IVA) con formato -->
-        <td>
-            <input type="number" style="width: 50% !important; text-align: center; margin: 0 auto;" class="form-control" min="0" max="100" value="0" onchange="updateDiscount('${barcode}', this.value)" />
-        </td>
-        <td>
-            <div class="quantity-controls">
-                <button onclick="adjustQuantity('${barcode}', -1)">-</button>
-                <input type="text" data-barcode="${barcode}" value="${product.quantity}" min="1" onchange="manualAdjustQuantity('${barcode}', this.value)" disabled>
-                <button onclick="adjustQuantity('${barcode}', 1)">+</button>
-            </div>
-        </td>
-        <td id="total-${barcode}">₡${product.total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-        <td id="iva-${barcode}">₡${(product.price * (product.tax_percentage / 100) * product.quantity).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td> <!-- IVA calculado con formato -->
-        <td><button onclick="removeProduct('${barcode}')" class="remove-btn"><i class="cursor-pointer fas fa-trash"></i></button></td>
-    `;
-            document.querySelector('#product-table tbody').appendChild(row);
-        }
-
-        function adjustQuantity(barcode, change) {
-            const product = products[barcode];
-            product.quantity += change;
-
-            // Evitar cantidades menores a 1
-            if (product.quantity < 1) product.quantity = 1;
-
-            // Actualizamos el valor del input visualmente
-            document.querySelector(`input[data-barcode='${barcode}']`).value = product.quantity;
-
-            recalculateProduct(barcode);
-        }
-
-        function manualAdjustQuantity(barcode, quantity) {
-            const product = products[barcode];
-            product.quantity = parseInt(quantity, 10) || 1; // Asegurar que la cantidad sea al menos 1
-
-            // Actualizamos el valor del input visualmente
-            document.querySelector(`input[data-barcode='${barcode}']`).value = product.quantity;
-
-            recalculateProduct(barcode);
-        }
-
-        function updateDiscount(barcode, discount) {
-            const product = products[barcode];
-            product.discount = parseFloat(discount) || 0;
-            recalculateProduct(barcode);
-        }
-
-        function recalculateProduct(barcode) {
-            const product = products[barcode];
-
-            // Calculamos el precio con descuento aplicado si lo hay
-            const discountedPriceSell = product.price_sell * (1 - (product.discount / 100));
-
-            // Calculamos el total sin IVA (cantidad * price_sell con descuento)
-            let totalWithDiscount = discountedPriceSell * product.quantity;
-
-            // Como price_sell ya incluye el IVA, no lo calculamos nuevamente
-            product.total = totalWithDiscount;
-
-            // Actualizamos los valores en la tabla con formato de miles
-            document.querySelector(`#total-${barcode}`).textContent =
-                `₡${product.total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            document.querySelector(`#iva-${barcode}`).textContent =
-                `₡${(product.price * (product.tax_percentage / 100) * product.quantity).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            updateTotalPrice();
-        }
-
-        function updateTotalPrice() {
-            let subtotal = 0; // Subtotal antes de aplicar cualquier descuento
-            totalPrice = 0; // Precio total (con descuentos aplicados)
-            totalIVA = 0; // Total del IVA
-
-            // Iteramos sobre cada producto para calcular los totales
-            Object.values(products).forEach(product => {
-                // Calculamos el subtotal sin aplicar descuento (solo el price_sell)
-                subtotal += parseFloat(product.price_sell) * product.quantity;
-
-                // Aplicamos descuento al total de venta (price_sell) si lo hay
-                let discountedPriceSell = product.price_sell * (1 - (product.discount / 100));
-
-                // Calculamos el total con descuento
-                let totalWithDiscount = discountedPriceSell * product.quantity;
-
-                // Calculamos el IVA sobre el precio costo
-                let productIVA = product.price * (product.tax_percentage / 100) * product.quantity;
-
-                // Sumamos los valores al total
-                totalPrice += totalWithDiscount;
-                totalIVA += productIVA; // Sumamos el IVA total
             });
 
-            // Aseguramos que el subtotal y totalPrice sean números válidos
-            subtotal = isNaN(subtotal) ? 0 : subtotal;
-            totalPrice = isNaN(totalPrice) ? 0 : totalPrice;
-            totalIVA = isNaN(totalIVA) ? 0 : totalIVA;
+            $('#new_cotizacion').on('click', function() {
+                $.ajax({
+                    url: '{{ route('cotizaciones.getNextNumber') }}', // Asegúrate de tener esta ruta en tu archivo de rutas
+                    type: 'GET',
+                    success: function(response) {
+                        $('#num_cotizacion').val(response.nextNumber);
+                    },
+                    error: function(error) {
+                        console.error('Error al obtener el número de cotización:', error);
+                    }
+                });
+            });
 
-            // Actualizamos los valores en la interfaz con formato de miles
-            document.getElementById('sub-total-price').textContent =
-                `Sub Total: ₡${subtotal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            document.getElementById('total-price-iva').textContent =
-                `Total IVA: ₡${totalIVA.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            document.getElementById('total-price').textContent =
-                `Total: ₡${totalPrice.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        }
+            // Limpiar los campos solo cuando es modo creación
+            $('#addCotizacionModal').on('shown.bs.modal', function() {
+                if (!isEditMode) {
+                    // Solo limpiar si es un nuevo registro (creación)
+                    $('#searchClient').val('');
+                    $('#clientResults').empty().hide();
+                    $('#selectedClientId').val('');
+                    $('#observaciones').val('');
+                    $('#fecha_vencimiento').val('');
+                    $('#cotizacion_id').val('');
+                    $('#clientResultsHeader').hide();
 
-        function removeProduct(barcode) {
-            const row = document.querySelector(`input[data-barcode='${barcode}']`).closest('tr');
-            row.remove();
-            delete products[barcode];
-            updateTotalPrice();
-        }
+                    $('#searchProducto').val('');
+                    $('#productsResults').empty().hide();
+                    $('#selectedProductId').val('');
+                    $('#productsResultsHeader').val('');
 
-        function focusBarcodeInput() {
-            document.getElementById('barcode').focus();
-        }
 
-        document.body.addEventListener('click', focusBarcodeInput);
+                    // Desmarcar el checkbox de crédito y ocultar el campo de plazo
+                    $('#inlineCheckbox1').prop('checked', false);
+                    $('#plazoContainer').hide();
+                    $('#plazo').val(''); // Limpiar el valor del campo plazo
+
+                    // Limpiar la tabla de productos seleccionados
+                    $('#selectedProductsTable tbody').empty();
+                    $('#subtotalDisplay').text('₡0.00');
+                    $('#taxDisplay').text('₡0.00');
+                    $('#discountDisplay').text('₡0.00');
+                    $('#totalDisplay').text('₡0.00');
+                }
+            });
+
+            // Función para manejar la búsqueda de clientes
+            $('#searchClient').on('input', function() {
+                let query = $(this).val();
+
+                if (query.length >= 2) { // Realizar la búsqueda solo si hay 2 o más caracteres
+                    $.ajax({
+                        url: '{{ route('cotizaciones.searchClientes') }}', // Cambia esta ruta a tu ruta real
+                        type: 'GET',
+                        data: {
+                            query: query
+                        },
+                        success: function(response) {
+                            let clients = response
+                                .data; // Supongamos que tu respuesta es del tipo { data: [...] }
+                            let resultsContainer = $('#clientResults');
+
+                            resultsContainer.empty();
+
+                            if (clients.length > 0) {
+                                $('#clientResultsHeader').show(); // Mostrar el encabezado
+                                resultsContainer.append($(
+                                    '#clientResultsHeader'
+                                )); // Asegurarse de que el encabezado esté en la parte superior
+
+                                clients.forEach(client => {
+                                    let clientItem = $('<div>')
+                                        .addClass('client-item')
+                                        .css({
+                                            padding: '5px',
+                                            cursor: 'pointer',
+                                            borderBottom: '1px solid #ddd',
+                                            display: 'flex',
+                                            justifyContent: 'space-between'
+                                        })
+                                        .data('client-id', client
+                                            .id
+                                        ) // Almacenar el ID del cliente en el elemento
+                                        .on('click', function() {
+                                            // Cuando se hace clic en un cliente, actualizar el input con el nombre y guardar el ID en un campo oculto
+                                            $('#searchClient').val(client.name);
+                                            $('#selectedClientId').val(client.id);
+                                            resultsContainer
+                                                .hide(); // Ocultar los resultados
+                                        });
+
+                                    // Agregar la cédula y el nombre al resultado
+                                    clientItem.append(
+                                        `<span style="width: 40%;">${client.id_number}</span>`
+                                    );
+                                    clientItem.append(
+                                        `<span style="width: 60%;">${client.name}</span>`
+                                    );
+
+                                    resultsContainer.append(clientItem);
+                                });
+
+                                resultsContainer.show(); // Mostrar el contenedor de resultados
+                            } else {
+                                $('#clientResultsHeader')
+                                    .hide(); // Esconder el encabezado si no hay resultados
+                                resultsContainer.hide(); // Ocultar si no hay resultados
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error al buscar clientes:', error);
+                        }
+                    });
+                } else {
+                    $('#clientResultsHeader').hide(); // Esconder el encabezado si hay menos de 2 caracteres
+                    $('#clientResults').empty()
+                        .hide(); // Limpiar y ocultar los resultados si hay menos de 2 caracteres
+                }
+            });
+
+
+            let barcodeTimeout;
+
+            $('#searchProducto').on('input', function() {
+                let query = $(this).val();
+
+                // Si el código ingresado tiene más de 5 caracteres (generalmente los códigos de barras son largos)
+                if (query.length >= 6) {
+                    clearTimeout(barcodeTimeout); // Limpiar cualquier timeout previo
+                    barcodeTimeout = setTimeout(function() {
+                        // Realizar la búsqueda automática del producto después de 1 segundo
+                        $.ajax({
+                            url: '{{ route('cotizaciones.searchProductos') }}', // Cambia esta ruta a tu ruta real
+                            type: 'GET',
+                            data: {
+                                query: query
+                            },
+                            success: function(response) {
+                                let productos = response.data;
+
+                                // Si encontramos un solo producto, lo agregamos automáticamente a la tabla
+                                if (productos.length === 1) {
+                                    addProductToTable(productos[0]);
+                                    $('#searchProducto').val(''); // Limpiar el input
+                                    $('#productsResults')
+                                        .hide(); // Ocultar los resultados
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error al buscar productos:', error);
+                            }
+                        });
+                    }, 1000); // Esperar 1 segundo después de que el código se ingrese completamente
+                }
+
+                // Esto mantiene la funcionalidad de búsqueda normal
+                if (query.length >= 2) {
+                    $.ajax({
+                        url: '{{ route('cotizaciones.searchProductos') }}',
+                        type: 'GET',
+                        data: {
+                            query: query
+                        },
+                        success: function(response) {
+                            let productos = response.data;
+                            let resultsContainer = $('#productsResults');
+
+                            resultsContainer.empty();
+
+                            if (productos.length > 0) {
+                                $('#productsResultsHeader').show();
+                                resultsContainer.append($('#productsResultsHeader'));
+
+                                productos.forEach(producto => {
+                                    let productItem = $('<div>')
+                                        .addClass('producto-item')
+                                        .css({
+                                            padding: '5px',
+                                            cursor: 'pointer',
+                                            borderBottom: '1px solid #ddd',
+                                            display: 'flex',
+                                            justifyContent: 'space-between'
+                                        })
+                                        .data('product-id', producto.id)
+                                        .on('click', function() {
+                                            addProductToTable(producto);
+
+                                            $('#searchProducto').val('');
+                                            $('#selectedProductId').val('');
+                                            resultsContainer.hide();
+                                        });
+
+                                    let imageUrl = producto.image_url ?
+                                        `http://localhost/sist_fact_v1/public/${producto.image_url}` :
+                                        '{{ asset('assets/img/elegir.webp') }}';
+
+                                    productItem.append(
+                                        `<span style="width: 20%;"><img src="${imageUrl}" class="avatar avatar-sm me-3"></span>`
+                                    );
+                                    productItem.append(
+                                        `<span style="width: 30%;">${producto.barcode}</span>`
+                                    );
+                                    productItem.append(
+                                        `<span style="width: 40%;">${producto.descripcion}</span>`
+                                    );
+                                    productItem.append(
+                                        `<span style="width: 10%;">${producto.price_sell}</span>`
+                                    );
+
+                                    resultsContainer.append(productItem);
+                                });
+
+                                resultsContainer.show();
+                            } else {
+                                $('#productsResultsHeader').hide();
+                                resultsContainer.hide();
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error al buscar productos:', error);
+                        }
+                    });
+                } else {
+                    $('#productsResultsHeader').hide();
+                    $('#productsResults').empty().hide();
+                }
+            });
+
+
+
+
+            function addProductToTable(producto) {
+                let table = $('#selectedProductsTable');
+                let tbody = table.find('tbody');
+
+                // Determinar si el producto viene de 'products' o 'cotizaciones_details'
+                let isCotizacionDetail = producto.hasOwnProperty('cotizacion_id');
+
+                // Obtener las propiedades según la fuente de datos
+                let barcode = isCotizacionDetail ? producto.barcode : producto.barcode || 'N/A';
+                let description = isCotizacionDetail ? producto.description : producto.descripcion || 'N/A';
+                let price = isCotizacionDetail ? producto.precio_unitario : producto.price || 0;
+                let priceSell = isCotizacionDetail ? producto.total : producto.price_sell || 0;
+                let taxPercentage = isCotizacionDetail ? producto.taxes : producto.tax_percentage || 0;
+                let discount = isCotizacionDetail ? producto.discount : 0;
+                let quantity = isCotizacionDetail ? producto.quantity : 1;
+
+                // Verificar si el producto ya está en la tabla
+                let existingRow = tbody.find(`tr[data-product-id="${producto.id}"]`);
+                if (existingRow.length > 0) {
+                    let quantityInput = existingRow.find('.product-quantity');
+                    let currentQuantity = parseFloat(quantityInput
+                        .val()); // Usamos parseFloat para manejar decimales
+                    let newQuantity = (currentQuantity + 1.00).toFixed(2); // Incrementamos en 1.00
+                    quantityInput.val(newQuantity);
+
+                    // Actualizar el total en la columna correspondiente
+                    let total = price * newQuantity;
+                    existingRow.find('.product-total').text(total.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }));
+                } else {
+                    // Si el producto no está en la tabla, agregar una nueva fila
+                    let row = `
+        <tr data-product-id="${producto.id}">
+            <td>${barcode}</td>
+            <td>${description}</td>
+            <td data-value="${price}">${parseFloat(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td data-value="${taxPercentage}">${parseFloat(taxPercentage).toFixed(2)}</td>
+            <td>
+                <div class="quantity-controls" style="display: flex; align-items: center;">
+                    <button type="button" class="btn btn-sm btn-outline-secondary decrease-quantity">-</button>
+                    <input type="number" class="form-control product-quantity" value="${parseFloat(quantity).toFixed(2)}" min="0.01" step="0.01" style="width: 80px; text-align: center; margin-bottom: 1rem;">
+                    <button type="button" class="btn btn-sm btn-outline-secondary increase-quantity">+</button>
+                </div>
+            </td>
+            <td style="text-align: center; display: flex; align-items: center; justify-content: center;">
+                <input type="number" class="form-control product-discount" value="${parseFloat(discount).toFixed(0)}" min="0" max="100" style="width: 60px; text-align: center;">
+            </td>
+            <td class="product-total">${parseFloat(priceSell).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm remove-product">Eliminar</button>
+            </td>
+        </tr>
+        `;
+
+                    tbody.append(row);
+                    table.show();
+                }
+
+                // Eventos para el aumento/disminución de cantidad
+                $('.increase-quantity').off('click').on('click', function() {
+                    let quantityInput = $(this).siblings('.product-quantity');
+                    let currentQuantity = parseFloat(quantityInput
+                        .val()); // Usamos parseFloat para manejar decimales
+                    let newQuantity = (currentQuantity + 1.00).toFixed(2); // Incrementamos en 1.00
+                    quantityInput.val(newQuantity).trigger('input'); // Actualizamos el valor con decimales
+                });
+
+                $('.decrease-quantity').off('click').on('click', function() {
+                    let quantityInput = $(this).siblings('.product-quantity');
+                    let currentQuantity = parseFloat(quantityInput
+                        .val()); // Usamos parseFloat para manejar decimales
+                    if (currentQuantity > 1.00) {
+                        let newQuantity = (currentQuantity - 1.00).toFixed(2); // Decrementamos en 1.00
+                        quantityInput.val(newQuantity).trigger(
+                            'input'); // Actualizamos el valor con decimales
+                    }
+                });
+
+                // Permitir ingreso manual en el input
+                $('.product-quantity').off('input').on('input', function() {
+                    let value = parseFloat($(this).val());
+
+                    // Si el valor ingresado es inválido o menor que el mínimo, establecer un valor por defecto
+                    if (isNaN(value) || value < 0.01) {
+                        $(this).val(0.01);
+                    }
+                });
+
+                // Actualizar el total cuando cambie la cantidad o el descuento
+                $('.product-quantity, .product-discount').off('input').on('input', function() {
+                    let row = $(this).closest('tr');
+                    let quantity = parseFloat(row.find('.product-quantity').val()) ||
+                        1.00; // Usar parseFloat para cantidades decimales
+                    let discountPercentage = parseFloat(row.find('.product-discount').val()) || 0;
+                    let price = parseFloat(row.find('td:nth-child(3)').data('value'));
+                    let taxPercentage = parseFloat(row.find('td:nth-child(4)').data('value'));
+                    let total = price * quantity;
+
+                    // Calcular el monto de descuento
+                    let discountAmount = total * (discountPercentage / 100);
+                    total -= discountAmount;
+
+                    // Calcular el monto de impuesto
+                    let taxAmount = total * (taxPercentage / 100);
+                    total += taxAmount;
+
+                    row.find('.product-total').text(total.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }));
+
+                    updateTotals();
+                });
+
+                // Evento para eliminar la fila del producto
+                $('.remove-product').off('click').on('click', function() {
+                    $(this).closest('tr').remove();
+                    if (tbody.children().length === 0) {
+                        table.hide();
+                    }
+                    updateTotals();
+                });
+
+                updateTotals();
+            }
+
+            function updateTotals() {
+                let subtotal = 0;
+                let totalDiscount = 0;
+                let totalTax = 0;
+                let totalGeneral = 0;
+
+                $('#selectedProductsTable tbody tr').each(function() {
+                    let price = parseFloat($(this).find('td:nth-child(3)').data(
+                        'value')); // Precio sin impuestos
+                    let quantity = parseFloat($(this).find('.product-quantity')
+                        .val()); // Cantidad con decimales
+                    let taxPercentage = parseFloat($(this).find('td:nth-child(4)').data(
+                        'value')); // % de impuesto
+                    let discountPercentage = parseFloat($(this).find('.product-discount')
+                        .val()); // % de descuento
+
+                    // Verificar si los valores son válidos
+                    if (isNaN(price)) price = 0;
+                    if (isNaN(quantity)) quantity = 1;
+                    if (isNaN(taxPercentage)) taxPercentage = 0;
+                    if (isNaN(discountPercentage)) discountPercentage = 0;
+
+                    // 1. Calcular el subtotal del producto sin impuestos ni descuentos (price * quantity)
+                    let productSubtotal = price * quantity;
+
+                    // 2. Calcular el monto del descuento (si lo hay) y restarlo
+                    let discountAmount = productSubtotal * (discountPercentage / 100);
+                    let subtotalAfterDiscount = productSubtotal - discountAmount;
+
+                    // Acumular el descuento total
+                    totalDiscount += discountAmount;
+
+                    // 3. Calcular el monto del impuesto (IVA) sobre el subtotal después del descuento
+                    let taxAmount = subtotalAfterDiscount * (taxPercentage / 100);
+
+                    // Acumular los impuestos totales
+                    totalTax += taxAmount;
+
+                    // 4. El total general del producto después de aplicar descuento e impuestos
+                    let productTotal = subtotalAfterDiscount + taxAmount;
+
+                    // Sumar al subtotal general (antes de impuestos y descuentos)
+                    subtotal += productSubtotal;
+
+                    // Sumar al total general (después de impuestos y descuentos)
+                    totalGeneral += productTotal;
+
+                    // Actualizar el total para este producto en la tabla
+                    $(this).find('.product-total').text(productTotal.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }));
+                });
+
+                // Mostrar los valores en la interfaz
+                $('#subtotalDisplay').text(subtotal.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }));
+                $('#discountDisplay').text(`₡${totalDiscount.toFixed(2)}`);
+                $('#taxDisplay').text(totalTax.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }));
+                $('#totalDisplay').text(totalGeneral.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }));
+            }
+
+
+            var CotizacionUrlTemplate = "{{ route('cotizaciones.show', ['id' => ':id']) }}";
+
+            // Evento para cargar datos de cotización en el formulario de edición
+            $(document).on('click', '.edit-btn', function(e) {
+                e.preventDefault();
+
+                isEditMode = true; // Establecer modo edición
+                console.log('Modo: Edición editar', isEditMode);
+                $('#addCotizacionModalLabel').text('Editar Cotización'); // Cambiar el título del modal
+                $('#btn_text_form').text('Editar Cotización');
+
+
+                var cotizacionId = $(this).data(
+                    'cotizacion-id'); // Obtiene el ID de la cotización desde el atributo data
+                var fetchUrl = CotizacionUrlTemplate.replace(':id', cotizacionId);
+
+                // Realizar una solicitud AJAX para obtener los datos de la cotización
+                $.ajax({
+                    url: fetchUrl, // Ruta para obtener los datos de la cotización
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log('Cotizacion', response);
+
+                        // Rellenar el formulario con los datos obtenidos
+                        $('#num_cotizacion').val(response.numero_cotizacion);
+                        $('#selectedClientId').val(response.id_cliente);
+                        $('#searchClient').val(response.cliente.name);
+                        $('#fecha_creacion').val(response.start_date);
+                        $('#fecha_vencimiento').val(response.end_date);
+                        $('#observaciones').val(response.terms);
+                        $('#cotizacion_id').val(response.id);
+                        $('#inlineCheckbox1').prop('checked', response.credito === 1);
+                        if (response.credito === 1) {
+                            $('#plazoContainer').removeClass('hidden-important').show();
+                            $('#plazo').val(response.plazo);
+                        } else {
+                            $('#plazoContainer').hide();
+                            $('#plazo').val('');
+                        }
+
+
+                        // Limpiar la tabla de productos y agregar los productos obtenidos
+                        $('#selectedProductsTable tbody').empty();
+                        response.productos.forEach(producto => {
+                            console.log('Productos', producto);
+                            addProductToTable(
+                                producto
+                            ); // Esta función ya la tienes para agregar productos a la tabla
+                        });
+
+                        // Mostrar el modal de edición
+                        $('#addCotizacionModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error al cargar los datos de la cotización:', error);
+                    }
+                });
+            });
+
+            // Función que abre el modal en modo creación
+            $(document).on('click', '#new_cotizacion', function() {
+                isEditMode = false; // Establecer modo creación
+                console.log('Modo: Creación New', isEditMode);
+                $('#addCotizacionModalLabel').text('Nueva Cotización'); // Cambiar el título del modal
+                $('#addCotizacionModal').modal('show'); // Abrir el modal con JavaScript
+            });
+
+
+
+
+
+
+
+
+
+            $('#inlineCheckbox1').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('#plazoContainer').removeClass('hidden-important').show(); // Mostrar
+                } else {
+                    $('#plazoContainer').addClass('hidden-important'); // Ocultar
+                    $('#plazo').val(''); // Limpiar el input
+                }
+            });
+
+            loadTableData('{{ route('cotizaciones.searchCotizacionList') }}');
+
+            // Evento de input para el buscador
+            $('#searchInput').on('input', function() {
+                const query = $(this).val();
+                loadTableData(`{{ route('cotizaciones.searchCotizacionList') }}?query=${query}`);
+            });
+
+            // Función para cargar datos paginados
+            function loadTableData(url) {
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        let tableBody = $('#cotizacionesTableBody');
+                        tableBody.empty();
+
+                        // Cargar las filas de la tabla
+                        response.data.forEach(cotizacion => {
+                            let formattedTotal = new Intl.NumberFormat('en-US', {
+                                style: 'currency',
+                                currency: 'CRC', // O la moneda que estés utilizando
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            }).format(cotizacion.total);
+
+                            let row = `
+                <tr>
+                    <td>
+                        <p class="text-xs font-weight-bold mb-0">${cotizacion.numero_cotizacion}</p>
+                    </td>
+                    <td style="text-align: center;">
+                        <p class="text-xs font-weight-bold mb-0">${cotizacion.cliente.name}</p>
+                    </td>
+                    <td style="text-align: center;">
+                        <p class="text-xs font-weight-bold mb-0">${cotizacion.start_date}</p>
+                    </td>
+                    <td style="text-align: center;">
+                        <p class="text-xs font-weight-bold mb-0">${formattedTotal}</p>
+                    </td>
+                    <td class="align-middle text-center text-sm">
+                        <span class="badge badge-sm bg-gradient-${getStatusClass(cotizacion.status)}">${getStatusLabel(cotizacion.status)}</span>
+                    </td>
+                    <td class="text-center">
+                        <a href="#" class="mx-3 edit-btn" data-cotizacion-id="${cotizacion.id}">
+                            <i class="fas fa-pen text-secondary"></i>
+                        </a>
+                        <a href="#" class="mx-3 pdf-btn" title="PDF" data-cotizacion-id="${cotizacion.id}">
+                            <i class="fas fa-file-pdf"></i>
+                        </a>
+                    </td>
+                </tr>`;
+                            tableBody.append(row);
+                        });
+
+                        // Renderizar los enlaces de paginación
+                        $('#paginationLinks').empty();
+                        if (response.links) {
+                            response.links.forEach((link, index) => {
+                                let label = link.label;
+
+                                // Reemplazar las palabras "Previous" y "Next" por los símbolos de flecha
+                                if (label.includes("Previous")) {
+                                    label = "&laquo;"; // Flecha hacia la izquierda
+                                }
+                                if (label.includes("Next")) {
+                                    label = "&raquo;"; // Flecha hacia la derecha
+                                }
+
+                                let activeClass = link.active ? 'active' : '';
+                                let disabledClass = link.url ? '' : 'disabled';
+                                let paginationLink = `
+                    <li class="page-item ${activeClass} ${disabledClass}">
+                        <a class="page-link" href="#" data-url="${link.url}" ${!link.url ? 'tabindex="-1"' : ''}>${label}</a>
+                    </li>`;
+                                $('#paginationLinks').append(paginationLink);
+                            });
+
+                            // Habilitar la navegación por paginación al hacer clic en los enlaces
+                            $('#paginationLinks .page-link').on('click', function(e) {
+                                e.preventDefault();
+                                const url = $(this).data('url');
+                                if (url) {
+                                    loadTableData(url); // Cargar la nueva página de resultados
+                                }
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error al obtener los datos:', error);
+                    }
+                });
+            }
+
+
+            // Evento para manejar la paginación
+            $(document).on('click', '.page-link', function(e) {
+                e.preventDefault();
+                let url = $(this).data('url');
+                if (url) {
+                    loadTableData(url);
+                }
+            });
+
+            $(document).on('click', '.pdf-btn', function(e) {
+                e.preventDefault();
+
+                // Obtener el id de cotización desde el atributo data-cotizacion-id
+                var cotizacionId = $(this).data('cotizacion-id');
+
+                // Construir la URL usando la función de Laravel
+                var pdfUrl = "{{ route('cotizaciones.pdf', ':id') }}".replace(':id', cotizacionId);
+
+                // Redirigir al usuario a la URL generada
+                window.location.href = pdfUrl;
+            });
+
+
+            $('#addCotizacionForm').on('submit', function(e) {
+                e.preventDefault();
+
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+
+
+                // Recopilar los datos del formulario
+                let formData = {
+                    num_cotizacion: $('#num_cotizacion').val(),
+                    client_id: $('#selectedClientId').val(),
+                    fecha_creacion: $('#fecha_creacion').val(),
+                    fecha_vencimiento: $('#fecha_vencimiento').val(),
+                    observaciones: $('#observaciones').val(),
+                    credito: $('#inlineCheckbox1').is(':checked') ? 1 : 0,
+                    plazo: $('#plazo').val(),
+                    productos: []
+                };
+
+                if (isEditMode) {
+                    formData.id = $('#cotizacion_id')
+                        .val(); // Usar el input oculto con el ID de la cotización
+                }
+
+                $('#selectedProductsTable tbody tr').each(function() {
+                    let producto = {
+                        barcode: $(this).find('td:nth-child(1)').text(),
+                        description: $(this).find('td:nth-child(2)').text(),
+                        precio_unitario: parseFloat($(this).find('td:nth-child(3)').data(
+                            'value')),
+                        quantity: parseInt($(this).find('.product-quantity').val()),
+                        discount: parseFloat($(this).find('.product-discount').val()) || 0,
+                        taxes: parseFloat($(this).find('td:nth-child(4)').data(
+                            'value')),
+                        total: parseFloat($(this).find('.product-total').text().replace(/,/g,
+                            '')) // Remover cualquier coma en la cantidad
+                    };
+                    formData.productos.push(producto);
+                });
+
+                console.log('Modo: Edición Btn Form', isEditMode);
+
+                $.ajax({
+                    url: isEditMode ? `{{ route('cotizaciones.update', ['id' => ':id']) }}`
+                        .replace(':id', $('#cotizacion_id').val()) :
+                        '{{ route('cotizaciones.store') }}',
+                    type: isEditMode ? 'PUT' : 'POST',
+                    data: formData, // Enviar los datos como un objeto
+                    success: function(response) {
+
+                        let successMessage = isEditMode ? 'Cotización editada con éxito.' :
+                            'Cotización creada con éxito.'; // Definir el mensaje según el modo
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Éxito!',
+                            text: successMessage,
+                            showConfirmButton: true,
+                            confirmButtonText: 'OK',
+                            timer: 1500,
+                            timerProgressBar: true,
+                            allowOutsideClick: true,
+                            willClose: () => {
+                                loadTableData(
+                                    '{{ route('cotizaciones.searchCotizacionList') }}'
+                                );
+                                $('#addCotizacionModal').modal('hide');
+                            }
+                        });
+                    },
+                    error: function(xhr) {
+                        var errors = xhr.responseJSON.errors;
+                        var errorHtml = '';
+                        $.each(errors, function(key, value) {
+                            errorHtml += '<p>' + value + '</p>';
+                        });
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            html: errorHtml,
+                            confirmButtonText: 'Cerrar'
+                        });
+                    }
+                });
+            });
+        });
     </script>
+    <script>
+        function getStatusClass(status) {
+            switch (status) {
+                case 'pendiente':
+                    return 'warning'; // Cambia el color a tu preferencia
+                case 'aceptada':
+                    return 'success';
+                case 'rechazada':
+                    return 'danger';
+                case 'expirada':
+                    return 'secondary'; // Color para 'expirada'
+                default:
+                    return 'dark'; // Default en caso de otros valores
+            }
+        }
 
+        function getStatusLabel(status) {
+            switch (status) {
+                case 'pendiente':
+                    return 'Pendiente';
+                case 'aceptada':
+                    return 'Aceptada';
+                case 'rechazada':
+                    return 'Rechazada';
+                case 'expirada':
+                    return 'Expirada';
+                default:
+                    return 'Desconocido'; // Para manejar posibles casos inesperados
+            }
+        }
+    </script>
+    <script>
+        // Obtener la fecha actual
+        const today_fecha = new Date();
+        // Formatear la fecha en formato YYYY-MM-DD
+        const formattedDate = today_fecha.toISOString().split('T')[0];
+        // Asignar la fecha al input
+        document.getElementById('fecha_creacion').value = formattedDate;
+    </script>
+    <script>
+        $('#minimize_menu').click(function() {
+            $('#sidenav-main').addClass('minimize-menu-side');
+            $('.direction_row').addClass('direction_row_css');
+            $('#esconderli').addClass('hidden_div');
+            $('.size_fix').addClass('fix_size_ajust');
+            $('#mostrarli').removeClass('hidden_div');
+            $('.nav-link-text').removeClass('ms-1');
+            $('.shadow').removeClass('me-2');
+        });
 
-
-</body>
-
-</html>
+        $('#maximize_menu').click(function() {
+            $('#sidenav-main').removeClass('minimize-menu-side');
+            $('.direction_row').removeClass('direction_row_css');
+            $('#esconderli').removeClass('hidden_div');
+            $('.size_fix').removeClass('fix_size_ajust');
+            $('#mostrarli').addClass('hidden_div');
+            $('.nav-link-text').addClass('ms-1');
+            $('.shadow').addClass('me-2');
+        });
+    </script>
+@endsection

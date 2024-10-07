@@ -18421,7 +18421,7 @@ hr.horizontal.gray-light {
     bottom: 0;
     box-shadow: none;
     display: block;
-    max-width: 15.625rem!important;
+    max-width: 15.625rem;
     overflow-y: auto;
     padding: 0;
     position: fixed;

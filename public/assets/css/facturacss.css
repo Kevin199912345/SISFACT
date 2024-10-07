@@ -1,0 +1,283 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    max-width: 100% !important;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.scanner-input {
+    width: 90%;
+    margin-bottom: 20px;
+    display: flex;
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    outline: none;
+    transition: border 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    border-color: #5cb85c;
+}
+
+.table-container {
+    width: 100%;
+    max-width: 90%;
+    margin-top: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th,
+table td {
+    padding: 15px;
+    text-align: center;
+}
+
+table th {
+    background-color: #5cb85c;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table td {
+    border-bottom: 1px solid #eee;
+}
+
+.sub-total-price {
+    text-align: right;
+    margin-top: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+}
+
+.total-price {
+    text-align: right;
+    margin-top: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+}
+
+.total-price-iva {
+    text-align: right;
+    margin-top: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    justify-content: center;
+}
+
+.quantity-controls button,
+.quantity-controls input {
+    border: 1px solid #ccc;
+    background-color: #fff;
+    padding: 5px 10px;
+    text-align: center;
+    width: 35px;
+    height: 35px;
+    line-height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.quantity-controls button:hover {
+    background-color: #e6e6e6;
+}
+
+.quantity-controls input {
+    width: 50px;
+    /* Ajusta el ancho del input si es necesario */
+    padding: 5px;
+    text-align: center;
+    font-size: 16px;
+    /* Ajusta el tamaño de la fuente si es necesario */
+}
+
+.remove-btn {
+    padding: 0 5px;
+    color: white !important;
+    background-color: #5cb85c;
+    /* Un rojo más claro, estilo tomate */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    /* Hacer la 'X' más grande */
+    line-height: 20px;
+    /* Ajustar la altura de línea si es necesario */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 35px;
+    /* Ajustar según el diseño */
+    width: 35px;
+    /* Hacer el botón cuadrado */
+}
+
+.remove-btn:hover {
+    background-color: #d9534f;
+    /* Un rojo más oscuro para hover */
+}
+
+
+/* Hacer que la tabla tenga un scroll interno */
+
+.table-container {
+    max-height: 50vh;
+    /* Altura máxima antes de que aparezca el scroll */
+    overflow-y: auto;
+    /* Scroll vertical dentro de la tabla */
+    margin-bottom: 20px;
+    /* Espacio entre la tabla y los totales */
+    border: 1px solid #ddd;
+    /* Añade un borde para destacar el área de la tabla */
+}
+
+
+/* Mantener el ancho completo de la tabla dentro del contenedor */
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+/* Asegurarse de que las celdas de la tabla tengan buen padding y un borde inferior */
+
+.table-container th,
+.table-container td {
+    padding: 8px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+
+/* Fijar los totales en la parte inferior derecha */
+
+.totales_facturacion_class {
+    position: fixed;
+    bottom: 20px;
+    background-color: #fff;
+    padding: 1%;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    /* Asegura que siempre esté visible */
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    width: 87%;
+    border-radius: 20px;
+}
+
+.table-container th {
+    position: sticky;
+    top: 0;
+    /* Fondo del encabezado para distinguirlo */
+    z-index: 2;
+    /* Asegura que esté por encima de las celdas de datos */
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
+    /* Sombra para mejor visualización */
+}
+
+
+/* Asegurar que las celdas no se desborden */
+
+.table-container th,
+.table-container td {
+    white-space: nowrap;
+    /* Evita que el contenido se desborde */
+}
+
+.btn {
+    background-image: linear-gradient(310deg, #627594, #a8b8d8);
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: .5rem;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-size: .75rem;
+    font-weight: 700;
+    line-height: 1.4;
+    padding: .75rem 1.5rem;
+    text-align: center;
+    transition: all .15s ease-in;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    vertical-align: middle;
+    background-position-x: 25%;
+    background-size: 150%;
+    box-shadow: 0 4px 7px -1px rgba(0, 0, 0, .11), 0 2px 4px -1px rgba(0, 0, 0, .07);
+    letter-spacing: -.025rem;
+    margin-left: 10px;
+    height: 40px;
+}
+
+#select_tipo_doc {
+    width: 15%;
+    margin-left: 10px;
+    height: 40px;
+}
+
+#additionalInput {
+    margin-left: 10px;
+    width: 25%;
+    height: 40px;
+}
+
+.searchcodeproduct {
+    width: 25%;
+}
+
+.checkfacturaelectronica {
+    width: 10% !important;
+}

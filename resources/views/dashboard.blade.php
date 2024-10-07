@@ -115,7 +115,29 @@
       </div>
     </a>
   </div>
+  <script>
+    $('#minimize_menu').click(function() {
+        $('#sidenav-main').addClass('minimize-menu-side');
+        $('.direction_row').addClass('direction_row_css');
+        $('#esconderli').addClass('hidden_div');
+        $('.size_fix').addClass('fix_size_ajust');
+        $('#id_container_invoice').addClass('max_with_container');
+        $('#mostrarli').removeClass('hidden_div');
+        $('.nav-link-text').removeClass('ms-1');
+        $('.shadow').removeClass('me-2');
+    });
 
+    $('#maximize_menu').click(function() {
+        $('#sidenav-main').removeClass('minimize-menu-side');
+        $('.direction_row').removeClass('direction_row_css');
+        $('#esconderli').removeClass('hidden_div');
+        $('.size_fix').removeClass('fix_size_ajust');
+        $('#id_container_invoice').removeClass('max_with_container');
+        $('#mostrarli').addClass('hidden_div');
+        $('.nav-link-text').addClass('ms-1');
+        $('.shadow').addClass('me-2');
+    });
+</script>
 @endsection
 @push('dashboard')
   <script>
